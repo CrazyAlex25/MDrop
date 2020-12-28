@@ -8,10 +8,10 @@ namespace MDrop
 {
     public abstract class JsonSettings<T> where T : class, new()
     {
-        #region save\load
         private const string configFileName = "user.dat";
+#if PROTECTED
         private static byte[] s_additionalEntropy = { 14, 18, 72, 63, 57 };
-
+#endif
         private static readonly JsonSerializerOptions jsonOpts = new JsonSerializerOptions
         {
             WriteIndented = true,
@@ -22,7 +22,9 @@ namespace MDrop
         public void Save()
         {
             var bytes = JsonSerializer.SerializeToUtf8Bytes<object>(this,jsonOpts);
-            //bytes = ProtectedData.Protect(bytes,s_additionalEntropy,DataProtectionScope.CurrentUser);
+#if PROTECTED
+           bytes = ProtectedData.Protect(bytes,s_additionalEntropy,DataProtectionScope.CurrentUser);
+#endif
             File.WriteAllBytes(configFileName, bytes);
         }
 
@@ -31,11 +33,12 @@ namespace MDrop
             try
             {
                 var bytes = File.ReadAllBytes(configFileName);
-                // bytes = ProtectedData.Unprotect(bytes, s_additionalEntropy, DataProtectionScope.CurrentUser);
+#if PROTECTED
+                 bytes = ProtectedData.Unprotect(bytes, s_additionalEntropy, DataProtectionScope.CurrentUser);
+#endif
                 return JsonSerializer.Deserialize<T>(bytes, jsonOpts);
             }
             catch { return new T(); }
         }
-        #endregion
     }
 }
