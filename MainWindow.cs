@@ -85,7 +85,7 @@ namespace MDrop
             listView1.Items.Add(item);
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-
+            listView1.Items[listView1.Items.Count - 1].EnsureVisible();
             listView1.EndUpdate();
         }
 
